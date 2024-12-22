@@ -5,12 +5,12 @@ description: Learn how to safely revoke signers and handle compromised signer sc
 
 # Revoking Signers
 
-One of the hardest problems for cross-chain wallets is revoking compromised signers. Most cross-chain wallets have no single source of truth for the wallet's configuration, so revoking a compromised signer requires broadcasting the revocation across all active chains. Keyspace introduces the ability to sync configuration changes across chains, which is the first step towards making revoking compromised signers easier. However, there are still two avenues for a compromised signer to take control of a wallet:
+Revoking signers is a critical process in maintaining wallet security, especially in scenarios where a signer has been compromised. This process ensures that the compromised key cannot be used to access or control the wallet.
 
 1. The target replica chain is **actively** used by the wallet, so it has been synced, but using data from 3.5+ days ago due to the master chain's settlement delay.
 2. The target replica chain is **inactive** and has never been synced, so the configuration that contains the compromised signer is still valid on that chain, *no matter how much time has elapsed*. (This is not a Keyspace-specific issue: it's a problem for most cross-chain wallets.)
 
-Keyspace handles the first scenario by allowing you to preconfirm revocations on active chains. The second scenario is currently infeasible to mitigate, so wallet vendors must understand the implications of revocations on inactive chains.
+Keyspace handles the first scenario by allowing you to preconfirm revocations on active chains. The second scenario is currently difficult to mitigate, so wallet vendors must understand the implications of revocations on inactive chains.
 
 ## Preconfirming Revocations on Active Chains
 
@@ -42,4 +42,4 @@ Cost-effective syncing depends on cross-chain Merkle proofs, but these can break
 
 The top two paths for addressing this currently seem to be introducing EVM opcodes for direct cross-chain storage reads, or standardizing cross-chain Merkle proof validation contracts that are upgraded with each hard fork, just like the withdrawal and deposit bridges are. The [L1SLOAD opcode proposal](https://ethereum-magicians.org/t/rip-7728-l1sload-precompile/20388) would eliminate the risk of L1 hard forks. L2 hard forks would require a similar opcode, either for a widely used master chain for keystores or for a dedicated rollup for keystores. Such a `KEYSTORESLOAD` opcode would eliminate the risk of L2 hard forks.
 
-Once one of these paths are viable, we expect to change our recommendation to require a recent sync even before preconfirmations can be used, which would limit the window of time that a compromised signer can be used to the eventual consistency period plus the settlement delay of the master chain.
+Once one of these paths is viable, we expect to change our recommendation to require a recent sync even before preconfirmations can be used, which would limit the window of time that a compromised signer can be used to the eventual consistency period plus the settlement delay of the master chain.

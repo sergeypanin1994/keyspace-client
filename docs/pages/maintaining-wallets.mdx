@@ -9,12 +9,12 @@ Beyond adding and removing signers, cross-chain syncing introduces additional co
 
 ## Performing Wallet Upgrades
 
-A wallet's configuration is deeply intertwined with the implementation contract that reads that configuration. Upgrading a wallet's implementation alone could break if it could not read the existing configuration, and updating the configuration without upgrading the implementation could break if the new implementation expects a new configuration. Keyspace can help wallet vendors implement atomic upgrades that ensure both the configuration and the implementation are upgraded at the same time.
+A wallet's configuration is deeply intertwined with the implementation contract that reads that configuration. Upgrading a wallet's implementation alone could fail if it cannot read the existing configuration. Similarly, updating the configuration without upgrading the implementation may fail if the new implementation expects a different configuration. Keyspace can help wallet vendors implement atomic upgrades that ensure both the configuration and the implementation are upgraded at the same time.
 
 To do this, the implementation address for the wallet can be stored in the keystore configuration that is synced across chains. Your wallet's [`_hookApplyNewConfig`](/keystore-basics#_hookapplynewconfig) is responsible for detecting the new implementation address and performing the upgrade. This new implementation address needs to be deployed on each chain supported by the wallet or the wallet will not be usable on those chains after syncing.
 
 :::note
-If your wallet provides direct access to `upgradeTo` or the equivalent for your proxy contract, the implementation can be overwritten without using Keyspace, and since this change will not be synced, the user will end up with inconsistent behavior across chains. Without care, this could lead to unexpected behavior.
+If your wallet provides direct access to `upgradeTo` or the equivalent for your proxy contract, the implementation can be overwritten without using Keyspace, and since this change will not be synced, the user will end up with inconsistent behavior across chains. Without proper safeguards, this inconsistency could lead to unexpected behavior.
 :::
 
 ## New Chains and Wallet Factories
@@ -37,7 +37,7 @@ If cross-chain Merkle proofs have stopped working due to hard forks, another way
 
 #### Recovery Guardians
 
-Recovery guardians affect whether the wallet can be activated on a new chain. Recovery guardians are typically stateful: the recovery is initiated on a blockchain, then can only be processed after a delay that is verified by proving the elapsed time since the recovery was initiated. Since recovery guardians require external state to be verified, they are not guaranteed to always successfully re-execute as preconfirmations on new replica chains indefinitely.
+Recovery guardians affect whether the wallet can be activated on a new chain. Recovery guardians are typically stateful: the recovery is initiated on a blockchain, then can only be processed after a delay that is verified by proving the elapsed time since the recovery was initiated. Recovery guardians rely on external state, making their re-execution as preconfirmations on new replica chains unreliable.
 
 In the current version of Keyspace, the way to build a recovery guardian is to write it as a periphery contract that is added as a signer to the wallet. When the conditions for the guardian are met, it calls `setConfig` directly on the wallet. `_hookIsNewConfigAuthorized` can then check `msg.sender` to verify that the guardian's address is authorized in the wallet's configuration.
 
