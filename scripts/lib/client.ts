@@ -7,10 +7,9 @@ export const chain = baseSepolia;
 
 export const client: PublicClient = createPublicClient({
   chain,
-  transport: http(
-    process.env.RPC_URL || ""
-  ),
+  transport: http(process.env.RPC_URL || ""),
 });
+
 
 export const masterClient: PublicClient = client;
 

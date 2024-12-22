@@ -7,7 +7,7 @@ description: Learn how to add and manage new signers in your Keyspace wallet
 
 When a new signer is configured, it's written directly to the master chain. But what if the new signer wants to start sending transactions on another chain? If that chain hasn't been synced recently, a sync will be necessary. And if the new signer was just added, that master chain block won't settle on L1 for 3.5 days (and up to 10 days in the case of optimistic rollup disputes).
 
-To get make new signers usable immediately, Keyspace supports *preconfirmations*, which replay the `setConfig` call from the master chain on a replica chain with the same arguments. The difference between `setConfig` on the master chain and `setConfig` on a replica chain is that if the replica chain's configuration conflicts with the master chain's configuration, the replica chain's configuration will eventually be overwritten during a sync.
+To make new signers usable immediately, Keyspace supports *preconfirmations*, which replay the `setConfig` call from the master chain on a replica chain with the same arguments. The difference between `setConfig` on the master chain and `setConfig` on a replica chain is that if the replica chain's configuration conflicts with the master chain's configuration, the replica chain's configuration will eventually be overwritten during a sync.
 
 ## Sync and Preconfirm with the New Signer
 
@@ -25,7 +25,7 @@ Executing a sync during the validation phase requires whitelisting cross-contrac
 
 ### ERC-4337 Validation Restrictions
 
-The complications for handling new signers are caused by [ERC-4337's validation restrictions](https://eips.ethereum.org/EIPS/eip-4337), which are enumerated in [ERC 7562](https://eips.ethereum.org/EIPS/eip-7562). Syncing via Merkle proofs requires access to an L1 state root, which requires either cross-contract storage access or the `BLOCKHASH` opcode, which is also prohibited by ERC-4337. Preconfirmations do not require cross-contract storage access to process, but we expect that most preconfirmations will require a sync at the same time.
+The complications for handling new signers are caused by [ERC-4337's validation restrictions](https://eips.ethereum.org/EIPS/eip-4337), which are enumerated in [ERC 7562](https://eips.ethereum.org/EIPS/eip-7562). Syncing via Merkle proofs requires access to an L1 state root, which depends on either cross-contract storage access or the BLOCKHASH opcode, both of which are prohibited by ERC-4337. Preconfirmations do not require cross-contract storage access to process, but we expect that most preconfirmations will require a sync at the same time.
 
 :::note
 ERC-4337 aggregators can take over validation duties for a wallet without any restrictions on cross-contract storage access because they are "staked entities." They can be blacklisted by bundlers when they misbehave, and ETH needs to be staked to set them up. Wallet vendors can write aggregators that handle syncing, which would allow new signers to pay the gas fees for their own configuration updates. Unfortunately, aggregators are not widely supported by bundlers yet.
@@ -41,7 +41,7 @@ The large ring buffer gives proofs based on these roots a long shelf life. The b
 
 ##### L1Block.hash
 
-On OP Stack chains, the latest hash for the parent chain is stored in the `L1Block` predeploy as `hash`. This value is updated once per parent chain block, which is too frequent for most bundlers to whitelist safely. (Note that while this predeploy is called `L1Block`, on L3 chains, it's expected to refer to the L2 chain.)
+On OP Stack chains, the parent chain's latest hash is stored in the L1Block predeploy as hash. This value is updated once per parent chain block, which is too frequent for most bundlers to whitelist safely. (Note that while this predeploy is called `L1Block`, on L3 chains, it's expected to refer to the L2 chain.)
 
 
 ## Set, Sync, and Preconfirm via Wallet Vendor

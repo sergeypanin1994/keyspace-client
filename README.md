@@ -46,7 +46,7 @@ bun run scripts/get-account.ts
 | Argument | Environment Variable | Description |
 | --- | --- | --- |
 | --private-key | PRIVATE_KEY | secp256k1 private key or P256 JWK |
-| --signature-type | | secp256k1 (default) or webauthn |
+| --signature-type | | secp256k1 (default) or WebAuthn |
 
 ### Send ETH
 ```bash
@@ -60,7 +60,7 @@ bun run scripts/send-eth.ts
 | --initial-config-data | | The initial config data needed to deploy the wallet |
 | --private-key | PRIVATE_KEY | secp256k1 private key or P256 JWK |
 | --to | | The address to send to |
-| --signature-type | | secp256k1 (default) or webauthn |
+| --signature-type | | secp256k1 (default) or WebAuthn |
 
 Make sure there's ETH in the account you're sending from. You can get the Ethereum address of the smart wallet by running `bun run scripts/get-account.ts`.
 
@@ -78,7 +78,7 @@ bun run scripts/change-owner.ts
 | --private-key | PRIVATE_KEY | Current private key of the owner |
 | --config-data | | Current config data for the keystore wallet (hex string) |
 | --owner-bytes | | The owner bytes to change in the keystore wallet |
-| --signature-type | | secp256k1 (default) or webauthn |
+| --signature-type | | secp256k1 (default) or WebAuthn |
 | --remove | | Flag to remove the owner instead of adding (optional) |
 
 ## Build Documentation
